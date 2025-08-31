@@ -1,0 +1,28 @@
+
+import java.util.*;
+class Solution {
+    private static void dfs(int[] arr,int i,ArrayList<Integer> temp,int target,ArrayList<ArrayList<Integer>> ans){
+        if(i>=arr.length || target<0){
+            return;
+        }
+        if(target==0){
+            ans.add(new ArrayList<>(temp));
+            return;
+        }
+        temp.add(arr[i]);
+        target=target-arr[i];
+        dfs(arr,i,temp,target,ans);
+        target=target+arr[i];
+        temp.remove(temp.size()-1);
+        dfs(arr,i+1,temp,target,ans);
+    }
+    // Function to find all combinations of elements
+    // in array arr that sum to target.
+    static ArrayList<ArrayList<Integer>> combinationSum(int[] arr, int target) {
+        // add your code here
+        ArrayList<Integer> temp=new ArrayList<>();
+        ArrayList<ArrayList<Integer>> ans=new ArrayList<>();
+        dfs(arr,0,temp,target,ans);
+        return ans;
+    }
+}
