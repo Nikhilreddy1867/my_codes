@@ -1,0 +1,105 @@
+import java.util.*;
+class DSU{
+
+    int[] parent;
+    int[] weight;
+    DSU(int n){
+
+        parent=new int[n];
+        weight=new int[n];
+        for(int i=0;i<n;i++){
+            parent[i]=i;
+            weight[i]=1;
+        }
+    }
+    int findPar(int node){
+        if(node==parent[node]){
+            return node;
+        }
+
+        return parent[node]=findPar(parent[node]);
+    }
+
+    void unionWt(int u,int v){
+        int new_u=findPar(u);
+        int new_v=findPar(v);
+        if (new_u == new_v) return;  
+        if(weight[new_u]>weight[new_v]){
+            parent[new_v]=new_u;
+            weight[new_u]+=weight[new_v];
+        }
+        else{
+            parent[new_u]=new_v;
+            weight[new_v]+=weight[new_u];
+        }
+    }
+}
+
+class Solution {
+    public int largestIsland(int[][] grid) {
+        int m=grid.length;
+        int n=grid[0].length;
+        DSU ds=new DSU(m*n);
+        int[] delRow={-1,0,1,0};
+        int[] delCol={0,-1,0,1};
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                if(grid[i][j]==0){
+                    continue;
+                }
+                else{
+                    int row=i;
+                    int col=j;
+                    for(int k=0;k<4;k++){
+                        int n_row=row+delRow[k];
+                        int n_col=col+delCol[k];
+                        if(n_row>=0 && n_col>=0 && n_row<m && n_col<n){
+                            if (grid[n_row][n_col] == 1) { 
+                                int num=row*n+col;
+                                int new_num = n_row * n + n_col;
+                                ds.unionWt(num, new_num);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        int ans=0;
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                if(grid[i][j]==1){
+                    continue;
+                }
+                else{
+                    int row=i;
+                    int col=j;
+                    HashSet<Integer> nik=new HashSet<>();
+                    for(int k=0;k<4;k++){
+                        int n_row=row+delRow[k];
+                        int n_col=col+delCol[k];
+                        if(n_row>=0 && n_col>=0 && n_row<m && n_col<n){
+                            if(grid[n_row][n_col]==1){
+                                int num=ds.findPar(n_row*n+n_col);
+                                nik.add(num);
+
+                            }
+                        }
+                    }
+                    int Tsize=0;
+                    for(Integer comp:nik){
+                        int size=ds.weight[comp];
+                        Tsize+=size;
+                    }
+                    ans=Math.max(ans,Tsize+1);
+                }
+
+            }
+        }
+        for (int i=0;i< m*n;i++) {
+            if (grid[i/n][i%n]==1) { 
+                ans=Math.max(ans,ds.weight[ds.findPar(i)]);
+            }
+        }
+        return ans;
+    }
+}
